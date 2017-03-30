@@ -1,28 +1,7 @@
-# http://www.postgresqltutorial.com/postgresql-python/
-# https://wiki.postgresql.org/wiki/Psycopg2_Tutorial
-# Products Table Schema
-# ------------------------------------------------------------------------------
-# id                          :integer
-# price                       :decimal(8, 2) len 8 digits, 2 of them are after ,
-# title                       :string(255)
-# available_inventory         :integer
-'''
-Shopping cart model
-we want to keep shopping cart state on the database layer so that returning
-users can continue their shopping experience from where they left off.
-
-Users can add and remove products from cart
-adding a product requires that available_inventory is greater than 0
-
-Users can purchase products
-available_inventory should decrement by an appropriate amount
-disallow purchases that would cause available_inventory to dip below 0
-
-Users can view their purchase history
-users will need to be able to view their purchase history
-'''
 import sys
 import psycopg2
+import mydb
+
 
 class Product:
     def __init__(self, product_id, price, title, available_inventory):
@@ -38,44 +17,54 @@ class Catalogue:
 class User:
     def __init__(self, user_id):
         self.user_id = user_id
-        self.cart = {} # {product_id: quantity}
-        self.purchase_history = {} # date: {items}
-'''
-1) assume there is only one user, so user_id is not needed
-'''
-class Shop:
-    def __init__(self):
-        catalogue = Catalogue()
-        users = {} # user_id: user
+        self.cart = None # {product_id: quantity}
+        self.history_ids = [] # date: {items}
+        self.choose_user()
 
+    def choose_user(self):
+        raw = mydb.choose_user(self.user_id)
+        print raw[0]
 
+    def view_users(self):
+        mydb.view_users()
 
-def add_to_cart(product_id, quantity):
-    print "add %s to cart: %s" % (product_id, quantity)
+    def add_to_cart(self, product_id, quantity):
 
-def purchase():
-    print "purchase"
+        print "add %s to cart: %s" % (product_id, quantity)
+        mydb.add_to_cart(self.user_id, product_id, quantity)
 
-def purchase_history():
-    print "purchase_history"
+    def purchase(self):
+        print "purchase"
 
-def process():
+    def purchase_history(self):
+        print "purchase_history"
+
+def process(user):
     user_input = raw_input("command: ").split()
     command = user_input[0]
     args = user_input[1:]
 
     if command == "add":
-        add_to_cart(args[0], args[1])
-        process()
+        user.add_to_cart(args[0], args[1])
+        process(user)
+    elif command == "vu":
+        user.view_users()
+        process(user)
     elif command == "purchase":
-        purchase()
-        process()
+        user.purchase()
+        process(user)
     elif command == "purchase_history":
-        purchase_history()
-        process()
+        user.purchase_history()
+        process(user)
     elif command == "none" or command == "exit":
         print "DONE"
         return
+    else:
+        print command
 
 if __name__ == "__main__":
-    process()
+    mydb.init_db()
+    user_id = raw_input("User ID: ").split()
+    user = User(user_id[0])
+
+    process(user)

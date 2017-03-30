@@ -9,6 +9,10 @@ add data: insert into products values (default, 49.99, 'Shirt', 10);
 view the Table: select * from products;
 close db: \q
 
+in the server:
+sudo su - postgres
+psql
+user: anya, pass: anyatran123
 Products:
   id: int,
   title: string,
