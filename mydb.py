@@ -22,72 +22,98 @@ def init_db():
         print 'Error %s' % e
         sys.exit(1)
 
-    # finally:
-    #     if con:
-    #         con.close()
+def close_db():
+    if con:
+        con.close()
+
+def reset_db():
+    cur.execute("DELETE FROM History")
+    cur.execute("DELETE FROM Cart")
+    cur.execute("UPDATE Products SET available_inventory=30 where id=1")
+    cur.execute("UPDATE Products SET available_inventory=12 where id=2")
+    cur.execute("UPDATE Products SET available_inventory=0 where id=3")
+    cur.execute("UPDATE Products SET available_inventory=5 where id=4")
+    cur.execute("UPDATE Products SET available_inventory=200 where id=5")
 
 def view_products():
     cur.execute("SELECT * FROM Products")
-    while True:
-        row = cur.fetchone()
-        if row == None:
-            break
-        print ("ID: " + str(row[0]) + "\t\tProduct: " + row[2] + "\t\tPrice: " + str(row[1]))
+    products = cur.fetchall()
+    if products == None or len(products) == 0:
+        print "Inventory is empty"
+    else:
+        print "==== Products ===="
+        for p in products:
+            print "ID: %d \t\tProduct: %s\t\t Price: %d" % (p[0], p[2], p[1])
+    return products
 
 def view_cart(user_id):
-    cur.execute("SELECT * FROM cart WHERE user_id=" + user_id)
-    print "==== cart: ===="
-    while True:
-        row = cur.fetchone()
-        if row == None:
-            break
-        print ("ID: " + str(row[0]) + "\t\tPID: " + str(row[1]) + "\t\tquant: " + str(row[2]))
-
+    cur.execute("SELECT * FROM Cart WHERE user_id=%s" % (user_id))
+    cart = cur.fetchall()
+    if cart == None or len(cart) == 0:
+        print "the cart is empty"
+    else:
+        print "==== cart: ===="
+        for c in cart:
+            product = get_from_products(c[1])
+            print "ID: %d\t\tProduct: %s\t\tQuantity: %d\t\tPrice: $%d" % (c[0], product[2], c[2], product[1])
+    return cart
 
 def view_history(user_id):
     cur.execute("SELECT * FROM History WHERE user_id=%s" % user_id)
-    print "==== History: ===="
-    while True:
-        row = cur.fetchone()
-        if row == None:
-            break
-        print ("Date: " + str(row[3]) + "\t\tProductID: " + str(row[1]) + "\t\tQuantity: " + str(row[2]))
+    history = cur.fetchall()
+    if history == None or len(history) == 0:
+        print "the history is empty"
+    else:
+        print "==== History: ===="
+        for h in history:
+            product = get_from_products(h[1])
+            print "Date: %s\t\tProductID: %d\t\tProductName: %s\t\tQuantity: %d\t\tPrice: %d"  % (str(h[3]), h[1], product[2], h[2], product[1])
+    return history
 
-# what if items < cart?
+
 def add_to_cart(user_id, product_id, quantity):
     product_cart = get_from_cart(user_id, product_id)
     product = get_from_products(product_id)
 
     if product == None:
         print "product doesnt exist"
+        return False
     elif quantity == 0:
-        print "please indicate quantity"
+        print "quantity cannot be zero"
+        return False
 
     elif product_cart == None:
         if product[3] - quantity >= 0:
             cur.execute("INSERT INTO Cart VALUES(default, %s, %d, %s)" % (product_id, quantity, user_id))
+            return True
         else:
             print "cannot add because not enough inventory"
+            return False
     else:
         new_quantity = product_cart[2] + quantity
         if product[3] - new_quantity >= 0:
             cur.execute("UPDATE CART SET quantity=%d WHERE id=%d" % (new_quantity, product_cart[0]))
+            return True
         else:
             print "cannot add because not enough inventory"
-    view_cart(user_id)
+            return False
 
 def remove_from_cart(user_id, product_id, quantity):
     product_cart = get_from_cart(user_id, product_id)
     if product_cart != None:
         new_quantity = product_cart[2] - quantity
         if new_quantity < 0:
-            print "can't remove more than currently in cart"
+            print "can't remove more than what is currently in cart"
+            return False
         elif new_quantity == 0:
             cur.execute("DELETE FROM Cart WHERE id=%d" % (product_cart[0]))
+            return True
         else:
             cur.execute("UPDATE CART SET quantity=%d WHERE id=%d" % (new_quantity, product_cart[0]))
+            return True
     else:
-        print "cart doesnt contain that product"
+        print "cart does not contain that product"
+        return False
 
 def purchase(user_id):
     cur.execute("SELECT * FROM Cart WHERE user_id=%s" % (user_id))
@@ -95,6 +121,7 @@ def purchase(user_id):
     print cart
     if cart == None or len(cart) == 0:
         print "the cart is empty"
+        return False
     else:
         for cart_item in cart:
             product = get_from_products(cart_item[1])
@@ -103,11 +130,13 @@ def purchase(user_id):
                 cur.execute("DELETE FROM Cart WHERE id=%d" % (cart_item[0]))
                 decrement_product(cart_item[1], product[3] - cart_item[2])
             else:
-                print "can't buy this item because not enough inventory"
+                print "%s is out of stock :(" % product[2]
                 continue
+        return True
 
 def decrement_product(product_id, new_quantity):
     cur.execute("UPDATE products SET available_inventory=%d WHERE id=%d" % (new_quantity, product_id))
+    return True
 
 def get_from_products(product_id):
     cur.execute("SELECT * FROM Products WHERE id=%s" % (product_id))
