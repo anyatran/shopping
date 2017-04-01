@@ -9,7 +9,7 @@ requirements.txt. Once you are done with that step, run `python shop.py`
 There are three tables in the database and here are there initial state:
 #### Products
 id | price  |  title  | available_inventory|
----|--------|---------+--------------------|
+---|--------|---------|--------------------|
  1 | 100.99 | shirt   |                  30|
  2 |  40.99 | skirt   |                  12|
  3 | 200.50 | shoes   |                   0|
@@ -18,9 +18,11 @@ id | price  |  title  | available_inventory|
 #### Cart
 id | product_id | quantity | user_id
 ---|------------|----------|---------
+   |            |          |
 #### History
 id | product_id | quantity | date | user_id
 ---|------------|----------|------|---------
+   |            |          |      |
 ## Commands
 When you start the program, it will ask for your `user ID` first. It should be a type of `Integer`.
 After that you can right commands after `command: ` prompt.
