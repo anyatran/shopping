@@ -118,7 +118,6 @@ def remove_from_cart(user_id, product_id, quantity):
 def purchase(user_id):
     cur.execute("SELECT * FROM Cart WHERE user_id=%s" % (user_id))
     cart = cur.fetchall()
-    print cart
     if cart == None or len(cart) == 0:
         print "the cart is empty"
         return False
@@ -132,6 +131,7 @@ def purchase(user_id):
             else:
                 print "%s is out of stock :(" % product[2]
                 continue
+        print "Thanks for your order!"
         return True
 
 def decrement_product(product_id, new_quantity):

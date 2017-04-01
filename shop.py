@@ -28,7 +28,7 @@ def process(user_id):
             print "wrong number of arguments for '%s'" % command
         else:
             user_id = args[0]
-    elif command == "none" or command == "exit":
+    elif command == "exit":
         print "DONE"
         mydb.close_db()
         return
@@ -39,9 +39,11 @@ def process(user_id):
 def get_user_id():
     user_input = raw_input("User ID: ").split()
     if len(user_input) > 1:
-        print "please only one user ID"
+        print "please include only one user ID"
+        get_user_id()
     elif len(user_input) == 0:
-        print "missing user ID"
+        print "missing a user ID"
+        get_user_id()
     else:
         return user_input[0]
 
