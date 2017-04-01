@@ -21,6 +21,8 @@ def process(user_id):
         mydb.purchase(user_id)
     elif command == "history":
         mydb.view_history(user_id)
+    elif command == "inventory":
+        mydb.view_products()
     elif command == "reset":
         mydb.reset_db()
     elif command == "user":
@@ -36,6 +38,8 @@ def process(user_id):
         print "wrong action: %s" % command
     process(user_id)
 
+# get user's ID
+# input should be a digit
 def get_user_id():
     user_input = raw_input("User ID: ").split()
     if len(user_input) > 1:
@@ -48,6 +52,5 @@ def get_user_id():
         return user_input[0]
 
 if __name__ == "__main__":
-    mydb.init_db()
     user_id = get_user_id()
     process(user_id)

@@ -6,7 +6,7 @@ The database is already running on the server so you don't have to
 do anything with setting it up. Just clone this repo and install psycopg2 from
 requirements.txt. Once you are done with that, run `python shop.py`
 ## Database Structure
-There are three tables in the database and here are there initial state:
+There are three tables in the database and here are their initial states:
 #### Products
 id | price  |  title  | available_inventory|
 ---|--------|---------|--------------------|
@@ -24,7 +24,9 @@ id | product_id | quantity | date | user_id
 ---|------------|----------|------|---------
    |            |          |      |
 ## Commands
-When you start the program, it will ask for your `user ID` first. It should be a type of `Integer`.
+When you start the program, it will ask for a `user ID` first. It should be a type of `Integer`.
+If the user already exists, he will be able to continue his shopping where he left
+off. If the userID doesn't exist, the program will create a new user for it
 After that you can write commands after `command: ` prompt.
 #### add
 Add a product to cart
@@ -46,19 +48,25 @@ View current user's purchase history
 ```
 history
 ```
+#### inventory
+View what is in the inventory. This is not required in the assignment, but it's
+a useful thing to have
+```
+inventory
+```
 #### purchase
 Purchase all products in current user's cart
 ```
 purchase
 ```
 #### user
-Switch to a new user
+Create a new user or switch to existing user
 ```
 user <user ID>
 ```
 #### reset
 Reset all tables to initial values like above.
-**This is only for demo purposes. Idealy, you won't be able to modify the database like this.**
+**This is only for demo purposes. In reality, you won't be able to modify the database like this.**
 ```
 reset
 ```
