@@ -1,6 +1,14 @@
-import mydb
+import psycopg2
+from mydb import MyDb
 
-def process(user_id):
+# Set postgres Decimal return type to python's float
+DEC2FLOAT = psycopg2.extensions.new_type(
+    psycopg2.extensions.DECIMAL.values,
+    'DEC2FLOAT',
+    lambda value, curs: float(value) if value is not None else None)
+psycopg2.extensions.register_type(DEC2FLOAT)
+
+def process(mydb, user_id):
     user_input = raw_input("command: ").split()
     command = user_input[0]
     args = user_input[1:]
@@ -36,7 +44,7 @@ def process(user_id):
         return
     else:
         print "wrong action: %s" % command
-    process(user_id)
+    process(mydb, user_id)
 
 # get user's ID
 # input should be a digit
@@ -52,5 +60,9 @@ def get_user_id():
         return user_input[0]
 
 if __name__ == "__main__":
+    con = psycopg2.connect("host='104.131.100.94' dbname='everlane' user='postgres' password='anyatran'")
+    con.autocommit = True
+
     user_id = get_user_id()
-    process(user_id)
+    mydb = MyDb(con)
+    process(mydb, user_id)

@@ -3,8 +3,7 @@ This is a small project for a simple shopping cart system.
 ## Setup
 The program is built in python with postgresql.
 The database is already running on the server so you don't have to
-do anything with setting it up. Just clone this repo and install psycopg2 from
-requirements.txt. Once you are done with that, run `python shop.py`
+do anything with setting it up. Just clone this repo and install psycopg2 and testing.postgresql from requirements.txt. Once you are done with that, run `python shop.py`. To run test, run `python test.py`
 ## Database Structure
 There are three tables in the database and here are their initial states:
 #### Products
