@@ -1,4 +1,4 @@
-# Everlane Shopping System
+# Shopping System
 This is a small project for a simple shopping cart system.
 ## Setup
 The program is built in python with postgresql.
