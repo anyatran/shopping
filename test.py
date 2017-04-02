@@ -8,16 +8,6 @@ import sys
 f = open(os.devnull, 'w')
 sys.stdout = f
 
-def handler(postgresql):
-    con = psycopg2.connect(**postgresql.dsn())
-    cur = con.cursor()
-    cur.execute("CREATE TABLE Products(id serial, price decimal(8,2), title varchar(255), available_inventory integer)")
-    cur.execute("INSERT INTO Products values(default, 10.00, 't-shirt', 2)")
-    cur.close()
-    con.commit()
-    con.close()
-
-
 class Test(unittest.TestCase):
     def handler(self, postgresql):
         con = psycopg2.connect(**postgresql.dsn())
